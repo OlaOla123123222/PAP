@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ascencíon — sobrevive a hordas infinitas de esqueletos. Cada onda mais mortal que a anterior." />
+  <title>ASCENCÍON — Enfrenta a Horda</title>
+
+  <!-- Ícone -->
+  <link rel="icon" type="image/png" href="img/logo-symbol.png" />
+
+  <!-- Tipografia -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Three.js (para os modelos 3D) via importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Fundo interativo (partículas) -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- ===================== NAVBAR FLUTUANTE ===================== -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="#top" class="nav__logo" aria-label="Ascencíon - início">
+        <img src="img/logo-dark.png" alt="Ascencíon" class="nav__logoimg" />
+      </a>
+      <nav class="nav__links" aria-label="Navegação principal">
+        <div class="nav__group">
+          <button class="nav__link nav__trigger" aria-expanded="false">O Jogo <span class="nav__caret">▾</span></button>
+          <div class="nav__drop">
+            <a href="#trailer">Trailer</a>
+            <a href="#galeria">Arsenal</a>
+            <a href="#mapa">O Mundo</a>
+            <a href="#arena">A Arena</a>
+            <a href="#ondas">As Ondas</a>
+          </div>
+        </div>
+        <div class="nav__group">
+          <button class="nav__link nav__trigger" aria-expanded="false">Comunidade <span class="nav__caret">▾</span></button>
+          <div class="nav__drop">
+            <a href="#comunidade">Fórum</a>
+            <a href="#avaliacoes">Avaliações</a>
+            <a href="#suporte">Suporte</a>
+          </div>
+        </div>
+        <a href="#updates" class="nav__link">Updates</a>
+        <a href="#comprar" class="nav__link">Comprar</a>
+      </nav>
+      <button class="nav__admin" id="adminBtn" hidden>Admin</button>
+      <button class="nav__account" id="accountBtn" aria-label="Conta">Entrar</button>
+      <button class="btn nav__cta" data-buy>Jogar agora</button>
+      <button class="nav__burger" id="burger" aria-label="Abrir menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <nav class="nav__mobile" id="navMobile" aria-label="Menu">
+      <span class="nav__mobtitle">O Jogo</span>
+      <a href="#trailer">Trailer</a>
+      <a href="#galeria">Arsenal</a>
+      <a href="#mapa">O Mundo</a>
+      <a href="#arena">A Arena</a>
+      <a href="#ondas">As Ondas</a>
+      <span class="nav__mobtitle">Comunidade</span>
+      <a href="#comunidade">Fórum</a>
+      <a href="#avaliacoes">Avaliações</a>
+      <a href="#suporte">Suporte</a>
+      <span class="nav__mobtitle">Mais</span>
+      <a href="#updates">Updates</a>
+      <a href="#comprar">Comprar</a>
+      <button class="nav__admin" id="adminBtnMobile" hidden>Painel Admin</button>
+      <button class="nav__account" id="accountBtnMobile">Entrar</button>
+      <button class="btn" data-buy>Jogar agora</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== HERO ===================== -->
+    <section class="hero" id="top">
+      <div class="container hero__inner">
+        <p class="eyebrow reveal">Sobrevivência / Horda infinita</p>
+        <h1 class="hero__title reveal" style="--d:.1s">
+          Enfrenta a<br />
+          <span class="hero__title-accent">horda sem fim</span>
+        </h1>
+        <p class="hero__lead reveal" style="--d:.2s">
+          Ondas de esqueletos vêm sem parar — e cada uma é mais mortal que a
+          anterior. Sem checkpoints. Sem descanso. Só tu, as tuas lâminas e a
+          pergunta: <em>quanto tempo aguentas?</em>
+        </p>
+        <div class="hero__actions reveal" style="--d:.3s">
+          <button class="btn" data-buy>Comprar — 5,00 €</button>
+          <a class="btn btn--ghost" href="#galeria">Ver o arsenal</a>
+        </div>
+        <dl class="hero__stats reveal" style="--d:.4s" id="heroStats"></dl>
+      </div>
+      <div class="hero__scroll" aria-hidden="true">
+        <span>Desliza</span>
+        <div class="hero__scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- ===================== TRAILER ===================== -->
+    <section class="trailer" id="trailer">
+      <div class="container">
+        <header class="trailer__head reveal">
+          <p class="eyebrow">Vê com os teus olhos</p>
+          <h2 class="trailer__title">O trailer</h2>
+          <p class="trailer__sub">
+            Ondas infinitas. Ossos por todo o lado. Isto é Ascencíon em ação.
+          </p>
+        </header>
+
+        <div class="trailer__frame reveal">
+          <!-- O iframe do YouTube só é criado quando se clica na capa
+               (assim a página não carrega o YouTube à partida) -->
+          <div class="trailer__player" id="trailerPlayer"></div>
+
+          <!-- Capa personalizada: miniatura do vídeo + botão de play -->
+          <button class="trailer__cover" id="trailerCover" aria-label="Reproduzir trailer">
+            <img
+              class="trailer__thumb"
+              src="https://i.ytimg.com/vi/RgsRDcudSw4/maxresdefault.jpg"
+              alt=""
+              loading="lazy"
+              onerror="this.src='https://i.ytimg.com/vi/RgsRDcudSw4/hqdefault.jpg'"
+            />
+            <span class="trailer__scrim"></span>
+            <span class="trailer__play">▶</span>
+            <span class="trailer__covertext">Ver trailer</span>
+          </button>
+
+          <div class="trailer__corner trailer__corner--tl"></div>
+          <div class="trailer__corner trailer__corner--tr"></div>
+          <div class="trailer__corner trailer__corner--bl"></div>
+          <div class="trailer__corner trailer__corner--br"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== GALERIA 3D ===================== -->
+    <section class="gallery" id="galeria">
+      <div class="container">
+        <header class="gallery__head reveal">
+          <p class="eyebrow">Arsenal</p>
+          <h2 class="gallery__title">Conhece cada peça</h2>
+          <p class="gallery__sub">O que te espera e com que os enfrentas. Gira cada modelo e arrasta para inspecionar.</p>
+        </header>
+
+        <div class="gallery__tabs" role="tablist">
+          <button class="gallery__tab is-active" data-tab="characters" role="tab">Inimigos</button>
+          <button class="gallery__tab" data-tab="weapons" role="tab">Armas</button>
+        </div>
+
+        <div class="gallery__stage">
+          <div class="gallery__list" id="galleryList"></div>
+
+          <div class="gallery__viewer">
+            <div class="viewer__canvas" id="viewerCanvas"></div>
+            <div class="viewer__hint">↻ arrasta para girar</div>
+          </div>
+
+          <div class="gallery__detail" id="galleryDetail"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MAPA ===================== -->
+    <section class="map" id="mapa">
+      <div class="container">
+        <header class="map__head reveal">
+          <p class="eyebrow">O Mundo</p>
+          <h2 class="map__title">Um só lugar.<br />Nenhuma saída.</h2>
+          <p class="map__sub">
+            Não há níveis para desbloquear nem mapas para escolher.
+            Há uma arena, e há a horda. Tudo o que acontece, acontece aqui —
+            e a única coisa que muda és tu, a cada onda que sobrevives.
+          </p>
+        </header>
+
+        <!-- Citação de destaque -->
+        <blockquote class="map__quote reveal">
+          <span class="map__quotemark">“</span>
+          Ao início parece grande. Por volta da onda dez, já não parece.
+        </blockquote>
+
+        <!-- Elementos da arena -->
+        <div class="map__grid">
+          <article class="mapel reveal">
+            <div class="mapel__ico" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
+                <rect x="8" y="6" width="8" height="28" rx="1"/>
+                <rect x="24" y="6" width="8" height="28" rx="1"/>
+                <path d="M6 34h28"/>
+              </svg>
+            </div>
+            <h3 class="mapel__name">Pilares</h3>
+            <p class="mapel__text">
+              Cobertura e armadilha ao mesmo tempo. Podes girar à volta deles
+              para quebrar a perseguição — mas basta um passo mal dado e ficas
+              entalado entre pedra e osso.
+            </p>
+          </article>
+
+          <article class="mapel reveal" style="--d:.08s">
+            <div class="mapel__ico" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M8 34V14a12 12 0 0 1 24 0v20"/>
+                <path d="M20 14v20M8 34h24"/>
+              </svg>
+            </div>
+            <h3 class="mapel__name">Portões</h3>
+            <p class="mapel__text">
+              É por aqui que eles entram. Aprender a ler que portão vai abrir
+              a seguir é a diferença entre controlar a onda e ser cercado por ela.
+            </p>
+          </article>
+
+          <article class="mapel reveal" style="--d:.16s">
+            <div class="mapel__ico" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M6 34l6-16 6 16M22 34l6-16 6 16"/>
+                <path d="M4 34h32"/>
+              </svg>
+            </div>
+            <h3 class="mapel__name">Espigões</h3>
+            <p class="mapel__text">
+              Não distinguem amigo de inimigo. Usa-os para afunilar a horda,
+              mas conta os teus passos — o terreno não perdoa distrações.
+            </p>
+          </article>
+
+          <article class="mapel reveal" style="--d:.24s">
+            <div class="mapel__ico" aria-hidden="true">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6">
+                <circle cx="20" cy="20" r="14"/>
+                <circle cx="20" cy="20" r="5"/>
+                <path d="M20 6v4M20 30v4M6 20h4M30 20h4"/>
+              </svg>
+            </div>
+            <h3 class="mapel__name">O centro</h3>
+            <p class="mapel__text">
+              Espaço aberto, visibilidade total, zero proteção. Ficar no meio é
+              tentador — e é exatamente onde a horda te quer.
+            </p>
+          </article>
+        </div>
+
+        <!-- Faixa de tensão -->
+        <div class="map__band reveal">
+          <div class="band__item">
+            <span class="band__k">Onda 1</span>
+            <span class="band__v">A arena parece enorme</span>
+          </div>
+          <div class="band__arrow" aria-hidden="true">→</div>
+          <div class="band__item">
+            <span class="band__k">Onda 10</span>
+            <span class="band__v">Começas a decorar os portões</span>
+          </div>
+          <div class="band__arrow" aria-hidden="true">→</div>
+          <div class="band__item band__item--last">
+            <span class="band__k">Onda 25+</span>
+            <span class="band__v">Já não há espaço para respirar</span>
+          </div>
+        </div>
+
+        <p class="map__cta reveal">
+          Queres ver com os teus olhos? <a href="#arena">Explora a arena em 3D ↓</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== ARENA 3D ===================== -->
+    <section class="arena" id="arena">
+      <div class="container">
+        <header class="arena__head reveal">
+          <p class="eyebrow">Planta do campo de batalha</p>
+          <h2 class="arena__title">Conhece o terreno<br />antes de o pisar</h2>
+          <p class="arena__sub">
+            Esta é a arena onde tudo acontece. Roda, aproxima, estuda cada
+            corredor e cada pilar — porque quando a horda chegar, não vais
+            ter tempo para olhar em volta.
+          </p>
+        </header>
+
+        <div class="arena__stage reveal">
+          <div class="arena__viewer" id="arenaViewer">
+            <div class="arena__loading" id="arenaLoading">
+              <div class="arena__spinner"></div>
+              <span id="arenaProgress">A carregar a arena…</span>
+            </div>
+          </div>
+
+          <div class="arena__controls">
+            <button class="arena__ctrl" id="arenaReset" title="Voltar à vista inicial">⟲ Repor vista</button>
+            <button class="arena__ctrl" id="arenaTop" title="Ver de cima">⬓ Vista de cima</button>
+            <button class="arena__ctrl" id="arenaSpin" title="Ligar/desligar rotação">⏸ Parar rotação</button>
+            <span class="arena__hint">Arrasta para rodar · Roda do rato para zoom</span>
+          </div>
+        </div>
+
+        <div class="arena__facts">
+          <div class="fact reveal"><span class="fact__num">01</span><div><h4>Arena central</h4><p>Espaço aberto onde a horda te cerca por todos os lados.</p></div></div>
+          <div class="fact reveal" style="--d:.1s"><span class="fact__num">02</span><div><h4>Pilares</h4><p>Usa-os como cobertura — ou fica encurralado contra eles.</p></div></div>
+          <div class="fact reveal" style="--d:.2s"><span class="fact__num">03</span><div><h4>Portões</h4><p>É por aqui que os esqueletos entram. Vigia-os.</p></div></div>
+          <div class="fact reveal" style="--d:.3s"><span class="fact__num">04</span><div><h4>Espigões</h4><p>Perigo para ti e para eles. Usa o terreno a teu favor.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ONDAS ===================== -->
+    <section class="waves" id="ondas">
+      <div class="container">
+        <header class="waves__head reveal">
+          <p class="eyebrow">A Escalada</p>
+          <h2 class="waves__title">A dificuldade nunca para</h2>
+          <p class="waves__sub">
+            Move o controlo e vê o que te espera. Cada onda traz mais inimigos,
+            mais resistentes e mais rápidos — para sempre. E a cada cinco ondas,
+            o Crusader Tank entra na arena.
+          </p>
+        </header>
+
+        <div class="waves__panel reveal">
+          <div class="waves__left">
+            <div class="waves__number">
+              <span class="waves__label">Onda</span>
+              <span class="waves__value" id="waveValue">01</span>
+              <span class="waves__boss" id="waveBoss" hidden>⚔ Crusader Tank</span>
+            </div>
+            <input type="range" min="1" max="50" value="1" class="waves__slider" id="waveSlider" aria-label="Selecionar onda" />
+            <div class="waves__metrics">
+              <div class="metric metric--foe">
+                <span class="metric__label">Esqueletos</span>
+                <span class="metric__value" id="mEnemies">2</span>
+              </div>
+              <div class="metric metric--foe">
+                <span class="metric__label">Vida de cada</span>
+                <span class="metric__value" id="mHp">100</span>
+              </div>
+            </div>
+
+            <div class="waves__you">
+              <span class="waves__youlabel">Tu, nesta onda</span>
+              <div class="waves__metrics">
+                <div class="metric metric--you">
+                  <span class="metric__label">O teu dano</span>
+                  <span class="metric__value" id="mPDmg">25</span>
+                </div>
+                <div class="metric metric--you">
+                  <span class="metric__label">A tua vida</span>
+                  <span class="metric__value" id="mPHp">100</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="waves__chart" id="waveChart" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PREÇOS ===================== -->
+    <section class="pricing" id="comprar">
+      <div class="container">
+        <header class="pricing__head reveal">
+          <p class="eyebrow">Escolhe a tua entrada</p>
+          <h2 class="pricing__title">Pronto para a horda?</h2>
+        </header>
+        <div class="pricing__grid" id="pricingGrid"></div>
+      </div>
+    </section>
+    <!-- ===================== COMUNIDADE (FÓRUM) ===================== -->
+    <section class="community" id="comunidade">
+      <div class="container">
+        <header class="community__head reveal">
+          <p class="eyebrow">Comunidade</p>
+          <h2 class="community__title">O covil dos sobreviventes</h2>
+          <p class="community__sub">
+            Partilha estratégias, conta o teu recorde de ondas, pede ajuda.
+            A horda é implacável — mas ninguém a enfrenta sozinho.
+          </p>
+        </header>
+
+        <div class="community__layout">
+          <!-- Coluna: criar tópico + lista -->
+          <div class="community__main">
+            <div class="composer" id="threadComposer">
+              <button class="composer__gate" id="threadGate" data-auth-gate>
+                Entra para criar um tópico
+              </button>
+              <div class="composer__form" id="threadForm" hidden>
+                <input class="composer__input" id="threadTitle" placeholder="Título do tópico" maxlength="120" />
+                <textarea class="composer__area" id="threadBody" placeholder="Escreve a tua mensagem…" rows="3" maxlength="1000"></textarea>
+                <div class="composer__foot">
+                  <span class="composer__hint" id="threadUserHint"></span>
+                  <button class="btn composer__send" id="threadSend">Publicar tópico</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="threads" id="threadsList"></div>
+          </div>
+
+          <!-- Coluna lateral: regras -->
+          <aside class="community__aside reveal">
+            <h3 class="aside__title">Regras do covil</h3>
+            <ul class="aside__list">
+              <li>Respeito acima de tudo. Sem toxicidade.</li>
+              <li>Partilha builds, mapas e recordes.</li>
+              <li>Nada de spoilers do chefe final sem aviso.</li>
+              <li>Bugs? Reporta com detalhe — ajuda toda a horda.</li>
+            </ul>
+            <div class="aside__stat">
+              <span class="aside__num" id="threadCount">0</span>
+              <span class="aside__label">tópicos abertos</span>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== AVALIAÇÕES ===================== -->
+    <section class="reviews" id="avaliacoes">
+      <div class="container">
+        <header class="reviews__head reveal">
+          <p class="eyebrow">Avaliações</p>
+          <h2 class="reviews__title">O veredicto da horda</h2>
+          <p class="reviews__sub">O que os jogadores dizem depois de caírem — e voltarem.</p>
+        </header>
+
+        <div class="reviews__summary reveal">
+          <div class="reviews__score">
+            <span class="reviews__avg" id="reviewAvg">—</span>
+            <div class="reviews__stars" id="reviewAvgStars"></div>
+            <span class="reviews__count" id="reviewCount">Ainda sem avaliações</span>
+          </div>
+          <div class="composer composer--review">
+            <button class="composer__gate" id="reviewGate" data-auth-gate>
+              Entra para deixar a tua avaliação
+            </button>
+            <div class="composer__form" id="reviewForm" hidden>
+              <div class="rating-input" id="ratingInput" role="radiogroup" aria-label="Nota">
+                <button data-star="1" aria-label="1 estrela">★</button>
+                <button data-star="2" aria-label="2 estrelas">★</button>
+                <button data-star="3" aria-label="3 estrelas">★</button>
+                <button data-star="4" aria-label="4 estrelas">★</button>
+                <button data-star="5" aria-label="5 estrelas">★</button>
+              </div>
+              <textarea class="composer__area" id="reviewBody" placeholder="Conta a tua experiência…" rows="3" maxlength="600"></textarea>
+              <div class="composer__foot">
+                <span class="composer__hint" id="reviewUserHint"></span>
+                <button class="btn composer__send" id="reviewSend">Publicar avaliação</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reviews__grid" id="reviewsList"></div>
+      </div>
+    </section>
+    <!-- ===================== CALENDÁRIO DE UPDATES ===================== -->
+    <section class="updates" id="updates">
+      <div class="container">
+        <header class="updates__head reveal">
+          <p class="eyebrow">Roadmap</p>
+          <h2 class="updates__title">O que aí vem</h2>
+          <p class="updates__sub">
+            Datas das próximas atualizações do jogo. Marca no calendário —
+            a horda não espera.
+          </p>
+        </header>
+        <div class="updates__timeline" id="updatesTimeline"></div>
+      </div>
+    </section>
+    <!-- ===================== SUPORTE ===================== -->
+    <section class="support" id="suporte">
+      <div class="container">
+        <header class="support__head reveal">
+          <p class="eyebrow">Suporte</p>
+          <h2 class="support__title">Precisas de ajuda?</h2>
+          <p class="support__sub">
+            Fala com o nosso assistente ou consulta as perguntas frequentes.
+            Se nada disto resolver, o fórum da comunidade está sempre aberto.
+          </p>
+        </header>
+
+        <!-- CHATBOT -->
+        <div class="chat reveal">
+          <div class="chat__bar">
+            <div class="chat__avatar">▲</div>
+            <div class="chat__ident">
+              <span class="chat__name">Assistente Ascencíon</span>
+              <span class="chat__status"><i></i> Online</span>
+            </div>
+            <button class="chat__reset" id="chatReset" title="Recomeçar">⟲</button>
+          </div>
+
+          <div class="chat__body" id="chatBody" role="log" aria-live="polite"></div>
+
+          <div class="chat__options" id="chatOptions"></div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq">
+          <h3 class="faq__title reveal">Perguntas frequentes</h3>
+          <div class="faq__list" id="faqList"></div>
+        </div>
+
+        <p class="support__foot reveal">
+          Não encontraste o que procuravas?
+          <a href="#comunidade">Pergunta no fórum →</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <img src="img/logo-light.png" alt="Ascencíon" class="footer__logoimg" />
+        <p>Sobrevive à horda. Se conseguires.</p>
+      </div>
+      <div class="footer__cols">
+        <div>
+          <h4>Jogo</h4>
+          <a href="#galeria">Arsenal</a>
+          <a href="#mapa">O Mundo</a>
+          <a href="#ondas">As Ondas</a>
+        </div>
+        <div>
+          <h4>Comprar</h4>
+          <a href="#comprar">Edições</a>
+          <a href="#comprar">Requisitos</a>
+        </div>
+        <div>
+          <h4>Comunidade</h4>
+          <a href="#comunidade">Fórum</a>
+          <a href="#avaliacoes">Avaliações</a>
+          <a href="#suporte">Suporte</a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <span id="footYear"></span>
+      <span>Feito para quem não recua.</span>
+    </div>
+  </footer>
+
+  <!-- ===================== PAINEL ADMIN ===================== -->
+  <div class="modal__overlay" id="adminOverlay" hidden>
+    <div class="modal modal--wide" role="dialog" aria-modal="true" aria-label="Painel de administração">
+      <button class="modal__close" id="adminClose" aria-label="Fechar">✕</button>
+      <p class="eyebrow">Zona restrita</p>
+      <h3 class="modal__title">Painel de administração</h3>
+
+      <div class="admin__tabs">
+        <button class="admin__tab is-active" data-atab="users">Utilizadores</button>
+        <button class="admin__tab" data-atab="calendar">Calendário de updates</button>
+        <button class="admin__tab" data-atab="mod">Moderação</button>
+        <button class="admin__tab" data-atab="orders">Compras</button>
+      </div>
+
+      <!-- Tab: utilizadores -->
+      <div class="admin__panel" id="adminUsers">
+        <p class="admin__hint">Remove contas de utilizadores. Esta ação é permanente.</p>
+        <div class="admin__userlist" id="adminUserList"></div>
+      </div>
+
+      <!-- Tab: calendário -->
+      <div class="admin__panel" id="adminCalendar" hidden>
+        <div class="admin__form">
+          <div class="field-row">
+            <div class="field"><label>Data</label><input type="date" id="upDate" /></div>
+            <div class="field"><label>Etiqueta</label>
+              <select id="upTag">
+                <option value="Grande update">Grande update</option>
+                <option value="Correção">Correção</option>
+                <option value="Evento">Evento</option>
+                <option value="Nova personagem">Nova personagem</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Título</label><input id="upTitle" placeholder="Ex: Atualização da Cripta" maxlength="80" /></div>
+          <div class="field"><label>Descrição</label><textarea id="upBody" rows="2" placeholder="O que traz esta atualização…" maxlength="300"></textarea></div>
+          <button class="btn" id="upAdd">Adicionar ao calendário</button>
+        </div>
+        <div class="admin__uplist" id="adminUpdateList"></div>
+      </div>
+
+      <!-- Tab: moderação -->
+      <div class="admin__panel" id="adminMod" hidden>
+        <p class="admin__hint">
+          Remove tópicos, respostas ou avaliações inadequadas. As remoções são permanentes.
+        </p>
+        <div class="admin__modtabs">
+          <button class="admin__modtab is-active" data-mtab="threads">Tópicos</button>
+          <button class="admin__modtab" data-mtab="reviews">Avaliações</button>
+        </div>
+        <div class="admin__modlist" id="adminModList"></div>
+      </div>
+
+      <!-- Tab: log de compras -->
+      <div class="admin__panel" id="adminOrders" hidden>
+        <div class="ordstats" id="ordStats"></div>
+        <div class="admin__modlist" id="adminOrderList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL DE AUTENTICAÇÃO ===================== -->
+  <div class="modal__overlay" id="authOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Conta" id="authModal">
+      <button class="modal__close" id="authClose" aria-label="Fechar">✕</button>
+      <div id="authContent"></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL DE CHECKOUT ===================== -->
+  <div class="modal__overlay" id="modalOverlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Checkout" id="modal">
+      <button class="modal__close" id="modalClose" aria-label="Fechar">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module" src="script.js"></script>
+  <!-- ===================== BOTÃO VOLTAR AO TOPO (espada) ===================== -->
+  <button class="totop" id="toTop" aria-label="Voltar ao topo" title="Voltar ao topo">
+    <span class="totop__ring" aria-hidden="true"></span>
+    <svg class="totop__sword" viewBox="0 0 24 44" aria-hidden="true">
+      <!-- lâmina -->
+      <path class="sw-blade" d="M12 2 L15.4 9 L15.4 25 L8.6 25 L8.6 9 Z"/>
+      <!-- gume (brilho central) -->
+      <path class="sw-edge" d="M12 3.5 L12 25"/>
+      <!-- guarda -->
+      <path class="sw-guard" d="M3.5 25.5 L20.5 25.5 L20.5 28.5 L3.5 28.5 Z"/>
+      <!-- punho -->
+      <rect class="sw-grip" x="10.2" y="28.5" width="3.6" height="9" rx="1"/>
+      <!-- pomo -->
+      <circle class="sw-pommel" cx="12" cy="39.8" r="2.6"/>
+    </svg>
+    <span class="totop__label">Topo</span>
+  </button>
+
+</body>
+</html>

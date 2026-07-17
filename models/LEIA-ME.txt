@@ -1,0 +1,46 @@
+MODELOS 3D DESTE PROJETO
+========================
+
+INCLUIDOS E LIGADOS:
+  Skeleton.glb    -> "O Esqueleto" (inimigo base)
+  crusader.fbx    -> "Crusader Tank" (CHEFE, a cada 5 ondas)
+  claymore.glb    -> "Claymore do Ocaso" (arma)
+  axe.fbx         -> "Machado de Duas Maos" (arma)
+  arena.fbx       -> Seccao "A Arena" (mapa 3D)
+
+  crusader/       -> 8 texturas do chefe (ja otimizadas)
+  axe/            -> textura do machado
+  textures/       -> 21 texturas da arena (ja otimizadas)
+
+OTIMIZACAO FEITA
+  Crusader: as texturas originais eram .tga de 4096x4096
+  (280 MB no total!). Convertidas para JPG 512/384 = 0.31 MB.
+  Reducao de 99.9% sem perda visivel.
+  Nota: .tga nao funciona em navegadores; JPG e obrigatorio.
+
+  Arena: 22 MB -> 0.47 MB (mesmo processo).
+
+COMO AS TEXTURAS SAO LIGADAS
+  Os FBX apontam para caminhos do Unity que nao existem na web.
+  Por isso cada modelo tem um campo "textures" no script.js
+  (seccao "1) DADOS DO JOGO") que liga cada MATERIAL do FBX
+  aos ficheiros certos:
+
+    textures: {
+      'Crusader tank_body': {
+        map:          'models/crusader/body_Albedo.jpg',
+        normalMap:    'models/crusader/body_Normal.jpg',
+        aoMap:        'models/crusader/body_Occlusion.jpg',
+        metalnessMap: 'models/crusader/body_Metallic.jpg',
+      },
+    }
+
+  O nome da chave TEM de ser igual ao nome do material no FBX.
+
+NOTA SOBRE O crusader.fbx (16.5 MB)
+  E grande porque o FBX esta em formato ASCII e traz 5097
+  curvas de animacao (do rig do jogo) que o site nao usa.
+  Se quiseres reduzir: abre no Blender, apaga as animacoes,
+  e exporta como .glb. Ficaria com ~1-2 MB.
+  Como so carrega quando se clica no chefe na galeria,
+  deixamos assim.
